@@ -555,7 +555,6 @@ img {
 .background_image {
   opacity: 0;
   object-fit: cover;
-  background-image: url('../images/US_sm.jpg');
   background-position: 0 0;
   background-size: auto;
   align-self: flex-end;
