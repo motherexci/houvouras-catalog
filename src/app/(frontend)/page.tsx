@@ -1,59 +1,69 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
+import config from '@/payload.config'
 import { getPayload } from 'payload'
 import React from 'react'
-import { fileURLToPath } from 'url'
 
-import config from '@/payload.config'
-import './styles.css'
-
-export default async function HomePage() {
-  const headers = await getHeaders()
+export default async function Gallery() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
-
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
+  const { docs: artworks } = await payload.find({
+    collection: 'political-artworks',
+    limit: 100,
+  })
 
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
+    <>
+      <nav className="nav-2">
+        <div className="nav-container">
+          <div className="nav-menu-wrap">
+            <div data-w-id="62875dc8-5da2-b955-8050-8bd4592fb2bc" className="nav-icon-wrap">
+              <div className="menu-ham-text-wrap">
+                <div className="menu-ham-text menu">MENU</div>
+                <div className="menu-ham-text close">CLOSE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="page-wrapper">
+        <div className="loading_wrap">
+          <div className="loading-word">
+            <div className="loading-word_text hover-effect--cursor-square">
+              Discovery portfolio home of Matthew Houvouras
+            </div>
+          </div>
+        </div>
+
+        <div className="main-wrapper">
+          <div className="image-collection w-dyn-list">
+            <div role="list" className="image-collection w-dyn-items w-row">
+              {artworks.map((art) => {
+                const imageUrl =
+                  typeof art.imageHero === 'object' && art.imageHero !== null
+                    ? (art.imageHero as any).url
+                    : ''
+
+                return (
+                  <div
+                    key={art.id}
+                    data-filter={art.year || ''}
+                    role="listitem"
+                    className="canvas__item w-dyn-item w-col w-col-3"
+                  >
+                    <div className="project_image-wrap">
+                      <img src={imageUrl} alt={art.name} className="project_image" />
+                    </div>
+                    <div className="project_text-wrap">
+                      <div className="project_text hover-effect">{art.name}</div>
+                      <div className="project_sub-text hover-effect">{art.year}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
-    </div>
+    </>
   )
 }
